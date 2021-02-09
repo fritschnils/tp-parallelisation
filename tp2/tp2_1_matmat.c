@@ -26,12 +26,15 @@ void matmat_reference(double C[N][N], double A[N][N], double B[N][N]) {
 // Computation kernel (to parallelize)
 void matmat_kernel(double C[N][N], double A[N][N], double B[N][N]) {
   size_t i, j, k;
-
-  for (i = 0; i < N; i++) {
-    for (j = 0; j < N; j++) {
-      C[i][j] = 0.;
-      for (k = 0; k < N; k++) {
-        C[i][j] += A[i][k] * B[k][j];
+  #pragma omp parallel num_threads(128)
+  {
+    #pragma omp for schedule(dynamic,N/128) private(j,k) collapse(2)
+    for (i = 0; i < N; i++) {
+      for (j = 0; j < N; j++) {
+        C[i][j] = 0.;
+        for (k = 0; k < N; k++) {
+          C[i][j] += A[i][k] * B[k][j];
+        }
       }
     }
   }

@@ -34,6 +34,16 @@ void enumeration_sort_reference(double tab[N]) {
   free(position);
   free(copy);
 }
+/* Résultats :
+
+Reference time : 0.66324 s
+Kernel time -- : 0.62043 s
+Speedup ------ : 1.06899
+Efficiency --- : 0.53450
+0.00222473 0.00249415 0.00283808 0.00286441 0.00346783 ... 4.99814 4.99854 4.99886 4.99908 4.99975 
+0.00222473 0.00249415 0.00283808 0.00286441 0.00346783 ... 4.99814 4.99854 4.99886 4.99908 4.99975 
+OK results :-)
+*/
 
 // Computation kernel (to parallelize)
 void enumeration_sort_kernel(double tab[N]) {
@@ -41,12 +51,15 @@ void enumeration_sort_kernel(double tab[N]) {
   size_t* position = malloc(N * sizeof(size_t));
   double* copy     = malloc(N * sizeof(size_t));
 
+  #pragma omp parallel for
   for (i = 0; i < N; i++) {
     position[i] = 0;
     copy[i] = tab[i];
   }
   
+
   for (j = 0; j < N; j++) {
+    #pragma omp parallel for
     for (i = 0; i < N; i++) {
       if ((tab[j] < tab[i]) || ((tab[i] == tab[j]) && (i < j))) {
         position[i]++;
@@ -54,12 +67,23 @@ void enumeration_sort_kernel(double tab[N]) {
     }
   }
 
+  #pragma omp parallel for
   for (i = 0; i < N; i++)
     tab[position[i]] = copy[i];
 
   free(position);
   free(copy);
 }
+/* Résultats :
+
+Reference time : 0.67546 s
+Kernel time -- : 0.24098 s
+Speedup ------ : 2.80297
+Efficiency --- : 1.40148
+0.000156581 0.000615921 0.00190651 0.00208136 0.00234239 ... 4.99512 4.99565 4.99691 4.99718 4.99805 
+0.000156581 0.000615921 0.00190651 0.00208136 0.00234239 ... 4.99512 4.99565 4.99691 4.99718 4.99805 
+OK results :-)
+*/
 
 void print_sample(double tab[], size_t size, size_t sample_length) {
   if (size <= 2 * sample_length) {

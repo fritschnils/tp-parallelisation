@@ -24,6 +24,19 @@ void pi_reference(size_t nb_steps, double* pi) {
 
   *pi = step * sum;
 }
+/* Résultats :
+
+Reference time : 0.71500 s
+Kernel time -- : 0.71322 s
+Speedup ------ : 1.00250
+Efficiency --- : 0.50125
+
+Pi (textbook)  : 3.141592653589793238462
+Pi reference - : 3.141592653589270422998
+Pi parallel -- : 3.141592653589270422998
+
+OK results :-)
+*/
 
 // Computation kernel (to parallelize)
 void pi_kernel(size_t nb_steps, double* pi) {
@@ -31,6 +44,7 @@ void pi_kernel(size_t nb_steps, double* pi) {
   double sum = 0.;
   double step = 1./(double)nb_steps;
 
+  #pragma omp parallel for reduction(+:sum) private(term)
   for (size_t i = 0; i < nb_steps; i++) {
     term = (i + 0.5) * step;
     sum += 4. / (1. + term * term);
@@ -38,6 +52,19 @@ void pi_kernel(size_t nb_steps, double* pi) {
 
   *pi = step * sum;
 }
+/* Résultats :
+
+Reference time : 0.71565 s
+Kernel time -- : 0.19072 s
+Speedup ------ : 3.75245
+Efficiency --- : 1.87622
+
+Pi (textbook)  : 3.141592653589793238462
+Pi reference - : 3.141592653589270422998
+Pi parallel -- : 3.141592653589777572876
+
+OK results :-)
+*/
 
 int main() {
   double pi, pi_ref;

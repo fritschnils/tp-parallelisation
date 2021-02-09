@@ -24,12 +24,23 @@ void bubble_sort_reference(double tab[N]) {
     }
   }
 }
+/* Résultats :
+
+Reference time : 1.94877 s
+Kernel time -- : 1.99292 s
+Speedup ------ : 0.97784
+Efficiency --- : 0.48892
+0.00290386 0.0444301 0.0904261 0.0909183 0.123984 ... 499.965 499.979 499.98 499.987 499.994 
+0.00290386 0.0444301 0.0904261 0.0909183 0.123984 ... 499.965 499.979 499.98 499.987 499.994 
+OK results :-)
+*/
 
 // Computation kernel (to parallelize)
 void bubble_sort_kernel(double tab[N]) {
   size_t i, j;
   double temp;
 
+  #pragma omp for schedule(guided)
   for (i = 0; i < N ; i++) {
     for (j = 0; j < N - i - 1; j++) {
       if (tab[j] > tab[j + 1]) {
@@ -40,6 +51,16 @@ void bubble_sort_kernel(double tab[N]) {
     }
   }
 }
+/* Résultats :
+
+Reference time : 2.13888 s
+Kernel time -- : 1.90986 s
+Speedup ------ : 1.11992
+Efficiency --- : 0.55996
+0.0214903 0.0382192 0.0431424 0.0460404 0.0666443 ... 499.805 499.82 499.887 499.951 499.972 
+0.0214903 0.0382192 0.0431424 0.0460404 0.0666443 ... 499.805 499.82 499.887 499.951 499.972 
+OK results :-)
+*/
 
 void print_sample(double tab[], size_t size, size_t sample_length) {
   if (size <= 2 * sample_length) {
